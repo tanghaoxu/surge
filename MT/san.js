@@ -165,7 +165,7 @@ async function check_disney() {
         let result = re.exec(data)
         if (result != null && result.length === 2) {
           region = result[1]
-        } else if (data.indexOf('www.disneyplus.com') !== -1) {
+        } else if (data.indexOf('www.disneyplus.cn') !== -1) {
           region = 'CN'
         } else {
           region = 'US'
