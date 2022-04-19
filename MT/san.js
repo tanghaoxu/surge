@@ -1,4 +1,3 @@
-
 const REQUEST_HEADERS = {
   'User-Agent':
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36',
@@ -35,7 +34,7 @@ async function check_youtube_premium() {
           return
         }
 
-        if (data.indexOf('Premium is not available in your country') !== -1) {
+        if (data.indexOf('premium is not available in your country') !== -1) {
           resolve('Not Available')
           return
         }
@@ -62,7 +61,7 @@ async function check_youtube_premium() {
       if (code === 'Not Available') {
         youtube_check_result += '油管未解锁'
       } else {
-        youtube_check_result += '油管解锁➟' + code.toUpperCase()
+        youtube_check_result += '油管➟' + code.toUpperCase()
       }
     })
     .catch((error) => {
@@ -118,7 +117,7 @@ async function check_netflix() {
       if (code === 'Not Found') {
         return inner_check(80018499)
       }
-      netflix_check_result += '奈飞解锁➟' + code.toUpperCase()
+      netflix_check_result += '奈飞➟' + code.toUpperCase()
       return Promise.reject('BreakSignal')
     })
     .then((code) => {
@@ -126,7 +125,7 @@ async function check_netflix() {
         return Promise.reject('Not Available')
       }
 
-      netflix_check_result += '奈飞自制➟' + code.toUpperCase()
+      netflix_check_result += '奈飞➟' + code.toUpperCase()
       return Promise.reject('BreakSignal')
     })
     .catch((error) => {
@@ -144,71 +143,50 @@ async function check_netflix() {
 }
 
 async function check_disney() {
-  let inner_check = (filmId) => {
+  let inner_check = () => {
     return new Promise((resolve, reject) => {
       let option = {
-        url: 'https://disney.api.edge.bamgrid.com/v1/public/graphql' + filmId,
+        url: 'https://www.disneyplus.com/',
         headers: REQUEST_HEADERS,
       }
       $httpClient.get(option, function (error, response, data) {
-        if (error != null) {
+        if (error != null || response.status !== 200) {
           reject('Error')
           return
         }
 
-        if (response.status === 403) {
-          reject('Not Available')
+        if (data.indexOf('disney is not available in your country') !== -1) {
+          resolve('Not Available')
           return
         }
 
-        if (response.status === 404) {
-          resolve('Not Found')
-          return
+        let region = ''
+        let re = new RegExp('"countryCode":"(.*?)"', 'gm')
+        let result = re.exec(data)
+        if (result != null && result.length === 2) {
+          region = result[1]
+        } else if (data.indexOf('www.disneyplus.com') !== -1) {
+          region = 'CN'
+        } else {
+          region = 'US'
         }
-
-        if (response.status === 200) {
-          let url = response.headers['x-originating-url']
-          let region = url.split('/')[3]
-          region = region.split('-')[0]
-          if (region == 'title') {
-            region = 'us'
-          }
-          resolve(region)
-          return
-        }
-
-        reject('Error')
+        resolve(region)
       })
     })
   }
 
   let disney_check_result = ''
 
-  await inner_check(81215567)
+  await inner_check()
     .then((code) => {
-      if (code === 'Not Found') {
-        return inner_check(80018499)
+      if (code === 'Not Available') {
+       disney_check_result += 'Disney未解锁'
+      } else {
+       disney_check_result += 'Disney➟' + code.toUpperCase()
       }
-      disney_check_result += 'disney解锁➟' + code.toUpperCase()
-      return Promise.reject('BreakSignal')
-    })
-    .then((code) => {
-      if (code === 'Not Found') {
-        return Promise.reject('Not Available')
-      }
-
-      disney_check_result += 'disney自制➟' + code.toUpperCase()
-      return Promise.reject('BreakSignal')
     })
     .catch((error) => {
-      if (error === 'BreakSignal') {
-        return
-      }
-      if (error === 'Not Available') {
-        disney_check_result += 'disney无法观看'
-        return
-      }
-      disney_check_result += '检测失败'
+     disney_check_result += '检测失败'
     })
 
   return disney_check_result
