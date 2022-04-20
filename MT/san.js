@@ -59,13 +59,13 @@ async function check_youtube_premium() {
   await inner_check()
     .then((code) => {
       if (code === 'Not Available') {
-        youtube_check_result += '油管未解锁'
+        youtube_check_result += '未解锁'
       } else {
         youtube_check_result += '油管➟' + code.toUpperCase()
       }
     })
     .catch((error) => {
-      youtube_check_result += '检测失败'
+      youtube_check_result += '失败'
     })
 
   return youtube_check_result
@@ -133,10 +133,10 @@ async function check_netflix() {
         return
       }
       if (error === 'Not Available') {
-        netflix_check_result += '奈飞无法观看'
+        netflix_check_result += '未解锁'
         return
       }
-      netflix_check_result += '检测失败'
+      netflix_check_result += '失败'
     })
 
   return netflix_check_result
@@ -180,13 +180,13 @@ async function check_disney() {
   await inner_check()
     .then((code) => {
       if (code === 'Not Available') {
-       disney_check_result += 'Disney未解锁'
+       disney_check_result += '未解锁'
       } else {
-       disney_check_result += 'Disney➟' + code.toUpperCase()
+       disney_check_result += '迪士尼➟' + code.toUpperCase()
       }
     })
     .catch((error) => {
-     disney_check_result += '检测失败'
+     disney_check_result += '失败'
     })
 
   return disney_check_result
